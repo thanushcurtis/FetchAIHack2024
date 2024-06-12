@@ -8,7 +8,7 @@ import json  # Import json for handling JSON data
 app = Flask(__name__)
 CORS(app)  
 
-analysis_address = 'agent1qvshnse5680dlthrzygny3y9nvvvvsdl8t7hr6f78jy3d59645j8qateu70!'
+analysis_address = 'agent1qvshnse5680dlthrzygny3y9nvvvvsdl8t7hr6f78jy3d59645j8qateu70'
 
 class analysisRequest(Model):
     request: str

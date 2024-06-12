@@ -1,4 +1,4 @@
-from uagents import Agent, Context, Model, Protocol
+from uagents import Agent, Bureau, Context, Model, Protocol
 from uagents.setup import fund_agent_if_low
 import requests
 from ai_engine import UAgentResponse, UAgentResponseType
@@ -8,9 +8,13 @@ from langchain_cohere import ChatCohere
 from langchain_cohere import  CohereEmbeddings
 import cohere
 from llama_index.readers.file import PDFReader
-
+ 
+class Message(Model):
+    message: str
+ 
 class documentAnalysis(Model):
     query: str
+
 
 cohere_api_key = '0H1Q7mCc30QBBa5owiQ0Z9BmnlA7FhQmxcwBU7yj'
 co = cohere.Client(cohere_api_key)
@@ -21,7 +25,6 @@ embeddings = CohereEmbeddings(cohere_api_key='0H1Q7mCc30QBBa5owiQ0Z9BmnlA7FhQmxc
 index = VectorStoreIndex.from_documents(documents, embed_model=embeddings)
 print(index)
 
-
 model = "command" 
 temperature = 0 
 max_tokens = 400
@@ -29,6 +32,7 @@ llm = ChatCohere(model=model,temperature=0,cohere_api_key=cohere_api_key,max_tok
 
 query_engine = index.as_query_engine(llm=llm)
 query_results = query_engine.retrieve("What is in this document?")
+
 
 # Query with Cohere
 def query_with_cohere(context, query):
@@ -49,39 +53,45 @@ context_from_llama_index = query_results
 #cohere_response = query_with_cohere(context_from_llama_index, "what is this rules in document?")
 #print("Cohere's response:", cohere_response)
 
-
 analysisAgent = Agent(
     name="DocAnalysis",
     port=8080,
     seed="DocAnalysis agent phrase",
-    endpoint=["http://127.0.0.1:8080/"],
+    
+)
+analysis_protocol = Protocol("Document Summarizer")
+
+requestAgent = Agent(
+    name="requestAgent",
+    port=8000,
+    seed="requestAgent secret phrase",
+
 )
 
+RECIPIENT_ADDRESS="agent1qvshnse5680dlthrzygny3y9nvvvvsdl8t7hr6f78jy3d59645j8qateu70"
 
-
-analysis_protocol = Protocol("Document Summarizer")
+@requestAgent.on_event('startup')
+async def send_message(ctx: Context):
+     ctx.logger.info(f'hello, my name is {requestAgent.name} and and my address is {requestAgent.address}!')
 
 @analysisAgent.on_event('startup')
 async def say_hello(ctx: Context):
     ctx.logger.info(f'hello, my name is {analysisAgent.name} and and my address is {analysisAgent.address}!')
-    # #ctx.logger.info(f"Received the question from the user {sender}.")[]
-    # query = "Summarize this document into key parts such as rules, types and dates which as understanble by laymen"
 
-    # try:
-    #     ctx.logger.info(" Loading the Document..")
-    #     ctx.logger.info(" Document Loaded Succesfully..")
-    #     response = query_with_cohere(context_from_llama_index,query)
-    #     if not response:
-    #         raise Exception("Failed to retrieve Response")
-        
-        
-    #     ctx.logger.info(f"Response: {response}")
-    
-    # except Exception as exc:
-    #     ctx.logger.error(f"An error occured: {exc}")
-    
+
+@requestAgent.on_interval(period=60.0)
+async def send_message(ctx: Context):
+    await ctx.send(analysisAgent.address, Message(message="hello there I'm requestAgent"))
+    ctx.logger.info("message sent")
+ 
+@requestAgent.on_message(model=Message)
+async def message_handler(ctx: Context, sender: str, msg: Message):
+    ctx.logger.info(f"Received message from {sender}: {msg.message}")
+
+ 
 @analysisAgent.on_message(model=documentAnalysis, replies=UAgentResponse)
 async def on_message(ctx: Context, sender: str, msg:documentAnalysis):
+    ctx.logger.info(f"Received message from {sender}: {msg.message}")
     ctx.logger.info(f"Received the question from the user {sender}.")
     query = "Summarize this document into key parts such as rules, types and dates"
 
@@ -113,8 +123,10 @@ async def on_message(ctx: Context, sender: str, msg:documentAnalysis):
 
 
 analysisAgent.include(analysis_protocol)
-
-
-
+ 
+bureau = Bureau()
+bureau.add(requestAgent)
+bureau.add(analysisAgent)
+ 
 if __name__ == "__main__":
-    analysisAgent.run()
+    bureau.run()
