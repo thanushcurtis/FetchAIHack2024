@@ -18,4 +18,7 @@ urlpatterns = [
     path('delete/', views.delete_file, name='delete_file'),
     path('retrieve/', views.file_content, name='retrieve_file'),
     path('', views.FrontendAppView.as_view(), name='home'),
+    path('summarise/', views.summarise_information, name='summarise_text'),
+    path('map/', views.map_data, name='map_data'),
+    path('recommend/', views.recommend, name='recommend'),
 ]
