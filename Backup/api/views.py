@@ -288,15 +288,16 @@ def logout_view(request):
 async def summarise_information(request):
     response = await query(destination=summarise_address, message=SummariseRequest(), timeout=15.0)
     data = json.loads(response.decode_payload())
-    return data
+    return Response(data)
+
 @csrf_exempt
 async def map_data(request):
     response = await query(destination=data_mapping_address, message=DataMappingRequest(), timeout=15.0)
     data = json.loads(response.decode_payload())
-    return data
+    return Response(data)
 
 @csrf_exempt
 async def recommend(request):
     response = await query(destination=recomendation_address, message=RecommedRequest(), timeout=15.0)
     data = json.loads(response.decode_payload())
-    return data
+    return Response(data)
