@@ -12,10 +12,6 @@ from llama_index.readers.file import PDFReader
 class Message(Model):
     message: str
  
-class documentAnalysis(Model):
-    query: str
-
-
 cohere_api_key = '0H1Q7mCc30QBBa5owiQ0Z9BmnlA7FhQmxcwBU7yj'
 co = cohere.Client(cohere_api_key)
 loader = PDFReader()
@@ -55,44 +51,37 @@ context_from_llama_index = query_results
 
 analysisAgent = Agent(
     name="DocAnalysis",
-    port=8080,
-    seed="DocAnalysis agent phrase",
+    seed="DocAnalysis agent phrase"
     
 )
-analysis_protocol = Protocol("Document Summarizer")
-
 requestAgent = Agent(
     name="requestAgent",
-    port=8000,
-    seed="requestAgent secret phrase",
+    seed="requestAgent secret phrase"
 
 )
 
-RECIPIENT_ADDRESS="agent1qvshnse5680dlthrzygny3y9nvvvvsdl8t7hr6f78jy3d59645j8qateu70"
+#RECIPIENT_ADDRESS="agent1qvshnse5680dlthrzygny3y9nvvvvsdl8t7hr6f78jy3d59645j8qateu70"
 
 @requestAgent.on_event('startup')
 async def send_message(ctx: Context):
      ctx.logger.info(f'hello, my name is {requestAgent.name} and and my address is {requestAgent.address}!')
+     await ctx.send(analysisAgent.address, Message(message="hello there I'm requestAgent"))
+     ctx.logger.info("message sent")
 
 @analysisAgent.on_event('startup')
 async def say_hello(ctx: Context):
     ctx.logger.info(f'hello, my name is {analysisAgent.name} and and my address is {analysisAgent.address}!')
 
 
-@requestAgent.on_interval(period=60.0)
-async def send_message(ctx: Context):
-    await ctx.send(analysisAgent.address, Message(message="hello there I'm requestAgent"))
-    ctx.logger.info("message sent")
- 
+
 @requestAgent.on_message(model=Message)
-async def message_handler(ctx: Context, sender: str, msg: Message):
+async def requestAgent_message_handler(ctx: Context, sender: str, msg: Message):
     ctx.logger.info(f"Received message from {sender}: {msg.message}")
 
  
-@analysisAgent.on_message(model=documentAnalysis, replies=UAgentResponse)
-async def on_message(ctx: Context, sender: str, msg:documentAnalysis):
+@analysisAgent.on_message(model=Message)
+async def analysisAgent_message_handle(ctx: Context, sender: str, msg:Message):
     ctx.logger.info(f"Received message from {sender}: {msg.message}")
-    ctx.logger.info(f"Received the question from the user {sender}.")
     query = "Summarize this document into key parts such as rules, types and dates"
 
     try:
@@ -122,7 +111,7 @@ async def on_message(ctx: Context, sender: str, msg:documentAnalysis):
         )
 
 
-analysisAgent.include(analysis_protocol)
+
  
 bureau = Bureau()
 bureau.add(requestAgent)
