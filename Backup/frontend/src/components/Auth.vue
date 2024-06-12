@@ -2,7 +2,7 @@
 
   <div class="login-container">   
     <div class="header-container"> 
-      <h1 class="logo">TuiLearn</h1> 
+      <h1 class="logo">TCS Pension Proposer</h1> 
     </div>
     <div class="registration-form">
       <h1 class="form-title">Login</h1>
@@ -20,13 +20,13 @@
           Remember me
         </label>
         <button type="submit" class="form-button">Login</button>
+        <div class="registration-form">
+            <router-link  class="reg" to="/register">Register here</router-link>
+        </div>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       </form>
      </div>
-    <div class="registration">      
-      <p >Don't have an account? </p>
-      <router-link class='reg' to="/register">Register here</router-link>
-    </div>
+  
 </div>
 <div class="box"></div>
 </template>
@@ -80,7 +80,7 @@ export default {
   position: fixed;
   margin-bottom: 600px;
   padding: 30px;
-  background-color: #e7c77c; /* Butter */
+  background-color: #af6b58; /* Butter */
   padding: 1em;
   color: #fff;
   text-align: center;
@@ -89,7 +89,6 @@ export default {
 
 .logo {
   font-size: 3em;
-  font-weight: bold;
 }
 
 .login-container {
@@ -98,16 +97,15 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #e3ac81; /* Butter Cream */
+  background: linear-gradient( rgb(230, 178, 36), rgb(204, 83, 204));/* Butter Cream */
 }
 
 .registration-form {
   z-index: 2;
-  margin: 0px 10px;
-  padding: 55px; /* Increased padding */
-  background-color: #fff; 
+  margin: 0px 100px;
+  padding: 10px 20px; /* Increased padding */
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
 }
 
 .form-title {
@@ -128,17 +126,17 @@ export default {
 .form-input {
   width: 100%;
   padding: 13px;
-  border: 1px solid #d2b48c;
+  border: 1px solid #af6b58;
   border-radius: 5px;
 }
 
 .form-button {
   width: 100%;
-  padding: 10px 50px;
+  padding: 10px 100px;
   border: none;
   border-radius: 5px;
-  background-color: #ffe4b5; /* Peach */
-  color: #8b5a2b; /* Dark Brown */
+  background-color: #af6b58;; /* Peach */
+  color: #f8f5f2; /* Dark Brown */
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -153,30 +151,18 @@ export default {
   text-align: center;
 }
 
-.registration {
-  text-align: center;
-  margin-bottom:10px;
-  z-index: 2;
-  color:#5d2910;
-  text-decoration: none;
-  font-weight: bold;
-  padding: 180px 110px;
-  background-color: #f5bd0664; 
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  border-radius: 5%;
 
-}
 .reg{
-  width: 100%;
-  padding: 10px 50px;
+  width: 300%;
+  padding: 10px 100px;
   border: none;
   border-radius: 5px;
-  background-color: #ffe4b5; /* Peach */
-  color: #8b5a2b; /* Dark Brown */
+  background-color: #af6b58;; /* Peach */
+  color: #f5f4f4; /* Dark Brown */
   cursor: pointer;
   transition: background-color 0.3s ease;
   text-decoration: none;
+  text-align: center;
 
 }
 .box{
