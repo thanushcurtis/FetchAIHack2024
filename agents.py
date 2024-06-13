@@ -276,7 +276,8 @@ async def recommendationAgent_message_handler(ctx: Context, sender: str, msg: Me
     I have given, list the criteria each person meets based on their details. Then calculate the fixed rate of pension increases and
     any other things you are able to calculate based on the data given. Use this percentage and other client details to calculate 
     a recommendation for the pension amount each client is entitiled to and how often they will be paid based on the pension criteria they meet. 
-    It is important to refer to the specific pension scheme I have given and their percentages and details!
+    It is important to refer to the specific pension scheme I have given and their percentages and details! The recommendation pension amount 
+    must be a numerical value every time.
     """
 
     try:

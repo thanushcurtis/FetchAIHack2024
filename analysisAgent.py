@@ -10,7 +10,10 @@ import cohere
 from llama_index.readers.file import PDFReader
 
 class documentAnalysis(Model):
-    query: str
+    request: str
+
+class documentAnalysisResponse(Model):
+    response: str
 
 cohere_api_key = '0H1Q7mCc30QBBa5owiQ0Z9BmnlA7FhQmxcwBU7yj'
 co = cohere.Client(cohere_api_key)
@@ -20,7 +23,6 @@ print("Number of documents loaded:", len(documents))
 embeddings = CohereEmbeddings(cohere_api_key='0H1Q7mCc30QBBa5owiQ0Z9BmnlA7FhQmxcwBU7yj')
 index = VectorStoreIndex.from_documents(documents, embed_model=embeddings)
 print(index)
-
 
 model = "command" 
 temperature = 0 
@@ -54,31 +56,17 @@ analysisAgent = Agent(
     name="DocAnalysis",
     port=8080,
     seed="DocAnalysis agent phrase",
-    endpoint=["http://127.0.0.1:8080/"],
+    endpoint=["http://localhost:8080/submit"],
 )
 
+fund_agent_if_low(analysisAgent.wallet.address())
 
+global_sender_add = None
 
-analysis_protocol = Protocol("Document Summarizer")
 
 @analysisAgent.on_event('startup')
 async def say_hello(ctx: Context):
     ctx.logger.info(f'hello, my name is {analysisAgent.name} and and my address is {analysisAgent.address}!')
-    # #ctx.logger.info(f"Received the question from the user {sender}.")[]
-    # query = "Summarize this document into key parts such as rules, types and dates which as understanble by laymen"
-
-    # try:
-    #     ctx.logger.info(" Loading the Document..")
-    #     ctx.logger.info(" Document Loaded Succesfully..")
-    #     response = query_with_cohere(context_from_llama_index,query)
-    #     if not response:
-    #         raise Exception("Failed to retrieve Response")
-        
-        
-    #     ctx.logger.info(f"Response: {response}")
-    
-    # except Exception as exc:
-    #     ctx.logger.error(f"An error occured: {exc}")
     
 @analysisAgent.on_message(model=documentAnalysis, replies=UAgentResponse)
 async def on_message(ctx: Context, sender: str, msg:documentAnalysis):
@@ -111,9 +99,35 @@ async def on_message(ctx: Context, sender: str, msg:documentAnalysis):
             )
         )
 
+@analysisAgent.on_query(model=documentAnalysis, replies={documentAnalysisResponse})
+async def on_query(ctx: Context, sender: str, msg:documentAnalysis):
+    ctx.logger.info(f"Received the question from the user {sender}.")
+    query = "Summarize this document into key parts such as rules, types and dates"
 
-analysisAgent.include(analysis_protocol)
-
+    try:
+        ctx.logger.info(" Loading the Document..")
+        ctx.logger.info(" Document Loaded Succesfully..")
+        response = await query_with_cohere(context_from_llama_index,query)
+        if not response:
+            raise Exception("Failed to retrieve Response")
+        
+        await ctx.send(
+            sender,
+            documentAnalysisResponse(
+                response=response,
+            )
+        )
+        ctx.logger.info(f"Response: {response}")
+    
+    except Exception as exc:
+        ctx.logger.error(f"An error occured: {exc}")
+        await ctx.send(
+            sender,
+            UAgentResponse(
+                message=f"Error: {exc}",
+                type=UAgentResponseType.ERROR
+            )
+        )
 
 
 if __name__ == "__main__":

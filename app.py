@@ -8,12 +8,12 @@ import json  # Import json for handling JSON data
 app = Flask(__name__)
 CORS(app)  
 
-analysis_address = 'agent1qvshnse5680dlthrzygny3y9nvvvvsdl8t7hr6f78jy3d59645j8qateu70'
+analysis_address = 'agent1qtzlyzgh4wezr86s96j56zkdjrzuyylkegdp7egpkfqys4kpvf3c5hm0cnx'
 
-class analysisRequest(Model):
+class documentAnalysis(Model):
     request: str
 
-class analysisResponse(Model):
+class documentAnalysisResponse(Model):
     response: str
 
 
@@ -22,12 +22,14 @@ def home():
     return "Welcome to the Document Analysis API!"
 
 
-@app.route('/query/<string:request>', methods=['GET'])
-async def get_details(request):
-    response = await query(destination=analysis_address, message=analysisRequest(request=request), timeout=60.0)
+@app.route('/query/', methods=['GET'])
+async def get_details():
+    response = await query(destination=analysis_address, message=documentAnalysis(request='Hello message'), timeout=60.0)
+    print(response)
     data = json.loads(response.decode_payload())
     print(data)
     return data
+
 
 
 if __name__ == '__main__':
