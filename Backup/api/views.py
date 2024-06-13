@@ -24,6 +24,16 @@ from django.http import Http404
 from django.conf import settings
 from django.views.static import serve
 
+from rest_framework.response import Response
+from uagents.query import query  # Assuming uagents library is installed
+from .models import SummariseRequest, DataMappingRequest, RecommedRequest
+from .serializers import SummariseResponseSerializer, DataMappingResponseSerializer, RecommedResponseSerializer
+
+# uAgents addreses
+summarise_address = ''
+data_mapping_address = ''
+recomendation_address = ''
+
 # View to render the frontend app
 class FrontendAppView(TemplateView):
     template_name = "index.html"
@@ -230,5 +240,20 @@ def logout_view(request):
         logout(request)
         return JsonResponse({'status': 'success'}, status=200)
 
+@csrf_exempt
+async def summarise_information(request):
+    response = await query(destination=summarise_address, message=SummariseRequest(), timeout=15.0)
+    data = json.loads(response.decode_payload())
+    return Response(data)
 
+@csrf_exempt
+async def map_data(request):
+    response = await query(destination=data_mapping_address, message=DataMappingRequest(), timeout=15.0)
+    data = json.loads(response.decode_payload())
+    return Response(data)
 
+@csrf_exempt
+async def recommend(request):
+    response = await query(destination=recomendation_address, message=RecommedRequest(), timeout=15.0)
+    data = json.loads(response.decode_payload())
+    return Response(data)

@@ -17,4 +17,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
    
     path('', views.FrontendAppView.as_view(), name='home'),
+    path('summarise/', views.summarise_information, name='summarise_text'),
+    path('map/', views.map_data, name='map_data'),
+    path('recommend/', views.recommend, name='recommend'),
 ]
