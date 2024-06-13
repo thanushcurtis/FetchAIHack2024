@@ -60,3 +60,7 @@ It takes in the data points mapped from the Mapping Agent and gives out recommen
 
 ### Output
 ![Recommendation](Recommend_output.jpeg)
+
+### Chat with PDF to get answers about the pension scheme
+![Chat](Chat_with_scheme.jpg)
+![Chat](image.png)
