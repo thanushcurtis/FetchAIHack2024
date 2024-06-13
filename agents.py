@@ -55,7 +55,6 @@ def query_with_cohere(context, query):
 
 context_from_llama_index = query_results 
 
-
 # Agents
 
 #Agent 1 for Document Analysis
@@ -65,32 +64,31 @@ analysisAgent = Agent(
     
 )
 
-
 #Agent 2 for Requesting Proposal
+
 requestAgent = Agent(
     name="requestAgent",
     seed="requestAgent secret phrase"
 
 )
 
-
 #Agent 3 for Mappping
+
 mappingAgent = Agent(
     name="mappingAgent",
     seed= 'mappingAgent secret phrase'
 )
 
-
 #Agent 4 for Recommendation
+
 recommendationAgent = Agent(
     name="recommendationAgent",
     seed="recommendationAgent secret phrase"
 )
-
-
 RECIPIENT_ADDRESS="agent1qvshnse5680dlthrzygny3y9nvvvvsdl8t7hr6f78jy3d59645j8qateu70"
 
 # Starting up the agents
+
 
 @requestAgent.on_event('startup')
 async def send_message(ctx: Context):
@@ -117,6 +115,7 @@ async def requestAgent_message_handler(ctx: Context, sender: str, msg: Message):
 
  
 # Querying the LLM for key parts such as rules, types and dates
+
 @analysisAgent.on_message(model=Message)
 async def analysisAgent_message_handle(ctx: Context, sender: str, msg:Message):
     ctx.logger.info(f"Received message from {sender}: {msg.message}")
@@ -147,6 +146,7 @@ async def analysisAgent_message_handle(ctx: Context, sender: str, msg:Message):
 async def mappingAgent_message_handler(ctx: Context, sender: str, msg: Message):
     ctx.logger.info(f"Received message from {sender}")
     # Dummy User information
+
     user_data = """
     User Data:
     Pension Details: Scheme: Example Pension Scheme (EPS) Pension Fund, Contracted Out: Yes, Contracted Out End Date: 30th April 2003, Post 5 April 1997 Basis: Reference Scheme Test, Equalisation Date: 1st November 1993, Retirement Details: Normal Retirement Date (NRD): 60th Birthday, Early Retirement Eligibility: From 55th Birthday, Early Retirement Ill Health Eligibility: Any age if "Incapacity" definition is met, Late Retirement: Pension must commence before age 75, Pension Revaluation in Deferment: Pre 6/4/1988 GMP: Fixed Rate Revaluation, Post 5/4/1988 GMP: As per Pre 6/4/1988 GMP, Non-GMP Benefits: Fixed 7.5%, Pension Increases in Payment: Pre 6/4/1988 GMP: Fixed 7.5%, Post 5/4/1988 GMP: Fixed 7.5%, Pre 6/4/1997 Excess: Fixed 7.5%, 6/4/1997 to 30/4/1999 Benefits: Fixed 7.5%, Post 30/4/1999 Benefits: RPI subject to a minimum increase of 0% and a maximum increase of 5%, Death Benefits: Qualifying Spouse’s Pension: 50% of member’s pre-commutation pension, Lump Sum on Death: None, Children’s Pension: None, Commutation Options: Available: Yes, maximum allowable under post 5 April 2006 legislation, Trivial Commutation Lump Sum Death Benefits: Yes, Guarantee Period: 5 years from the member’s retirement date.
@@ -156,6 +156,7 @@ async def mappingAgent_message_handler(ctx: Context, sender: str, msg: Message):
     query = "please extract criteria that we need to be able to provide to provide full pension scheme based on the information given, make it into the into json format with consie as possible use the below user data to create a pension scheme" + user_data
   
     # Error handling
+
     try:
         ctx.logger.info(" Mapping Data to Fields..")
         response = query_with_cohere(msg.message,query)
@@ -167,7 +168,6 @@ async def mappingAgent_message_handler(ctx: Context, sender: str, msg: Message):
     
     except Exception as exc:
         ctx.logger.error(f"An error occured: {exc}")
-
 
 # Recommendation Agent for Pension Proposal
 @recommendationAgent.on_message(model=Message)
@@ -298,6 +298,7 @@ async def recommendationAgent_message_handler(ctx: Context, sender: str, msg: Me
     """
 
     # Data for recommendation
+
     query_data = "clients data: " + clients + " pension data: " + msg.message
 
     query = """
