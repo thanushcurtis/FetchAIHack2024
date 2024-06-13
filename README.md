@@ -7,9 +7,9 @@ This pension recommendation system enables insurance providers to upload client 
 
 #Prerequisite
 1) To avoid dependency overlaps, create a virtual environment
-'''conda create -n myenv python=3.10'''
-2) Activate the environment
-'''conda activate myenv'''
+```conda create -n myenv python=3.10```
+3) Activate the environment
+```conda activate myenv```
 
 #To run the program
 1) Navigate into the Backup folder
