@@ -7,7 +7,8 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from .forms import RegisterForm
 
-#The following are the imports for the PDF file upload and processing
+"""The following are the imports for the PDF file upload and processing"""
+
 from .models import UploadFile
 import json
 import cohere
@@ -24,22 +25,24 @@ from django.http import Http404
 from django.conf import settings
 from django.views.static import serve
 
-# from rest_framework.response import Response
-# #from uagents.query import query  # Assuming uagents library is installed
-# from .models import SummariseRequest, DataMappingRequest, RecommedRequest
-# from .serializers import SummariseResponseSerializer, DataMappingResponseSerializer, RecommedResponseSerializer
-
-# uAgents addreses
+"""These are the addresses for the agents"""
 summarise_address = ''
 data_mapping_address = ''
 recomendation_address = ''
 
-# View to render the frontend app
 class FrontendAppView(TemplateView):
+    """This view renders the frontend app
+
+    Attributes:
+    template_name : str
+    """
+
     template_name = "index.html"
 
 # Custom 404 view
 def custom_404(request, exception):
+    """This view """
+
     try:
         return serve(request, 'index.html', document_root=settings.STATICFILES_DIRS[0])
     except IndexError:
