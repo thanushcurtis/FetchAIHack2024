@@ -23,7 +23,7 @@
     
     <!-- Footer Section -->
     <footer>
-      <p>&copy; 2024 TuiLearn. All rights reserved.</p>
+      <p>&copy; 2024 Pension Proposal. All rights reserved.</p>
     </footer>
   </div>
 </template>

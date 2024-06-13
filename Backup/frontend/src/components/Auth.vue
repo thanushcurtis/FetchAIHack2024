@@ -1,6 +1,7 @@
 <template>
-
+<!-- platform for pension proposal-->
   <div class="login-container">   
+    
     <div class="header-container"> 
       <h1 class="logo">TCS Pension Proposer</h1> 
     </div>
