@@ -25,9 +25,8 @@ def home():
 @app.route('/query/<string:request>', methods=['GET'])
 async def get_details(request):
     response = await query(destination=analysis_address, message=analysisRequest(request=request), timeout=60.0)
-    data = json.loads(response.decode_payload())
-    print(data)
-    return data
+    print(response)
+    return response
 
 
 if __name__ == '__main__':
