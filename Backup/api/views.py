@@ -217,8 +217,8 @@ def login_view(request):
             login(request, user)
             return JsonResponse({'detail': 'Login successful'})
         else:
-            return JsonResponse({'detail': 'Invalid credentials'}, s
-                                tatus = 400)
+            return JsonResponse({'detail': 'Invalid credentials'}, 
+                                status=400)
 
 @csrf_exempt
 def whoami_view(request):
