@@ -21,6 +21,7 @@
         </label>
         <button type="submit" class="form-button">Login</button>
         <div class="registration-form">
+            <p>Don't have an account?</p>
             <router-link  class="reg" to="/register">Register here</router-link>
         </div>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
@@ -97,13 +98,13 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient( rgb(230, 178, 36), rgb(204, 83, 204));/* Butter Cream */
+  background: linear-gradient( rgb(247, 157, 84), #af6b58);/* Butter Cream */
 }
 
 .registration-form {
   z-index: 2;
-  margin: 0px 100px;
-  padding: 10px 20px; /* Increased padding */
+  margin: 0px 1px;
+  padding: 20px 100px; /* Increased padding */
   border-radius: 10px;
 
 }
@@ -154,15 +155,16 @@ export default {
 
 .reg{
   width: 300%;
-  padding: 10px 100px;
+  padding: 12px 140px;
   border: none;
   border-radius: 5px;
-  background-color: #af6b58;; /* Peach */
+  background-color: #af6b58; /* Peach */
   color: #f5f4f4; /* Dark Brown */
   cursor: pointer;
   transition: background-color 0.3s ease;
   text-decoration: none;
   text-align: center;
+
 
 }
 .box{

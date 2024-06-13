@@ -64,52 +64,8 @@ def upload_pdf_view(request):
         return JsonResponse({'message': 'Invalid request method'}, status=400)
 
 
-# View to delete a PDF file
-@csrf_exempt
-def delete_file(request): 
-    if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
-    if request.method == 'DELETE':
-        try:
-            # Load the JSON data from the request body
-            data = json.loads(request.body)
-            title = data.get('title')
-            # Retrieve the file from the database
-            file = UploadFile.objects.get(title=title, user=request.user)
-            file.delete()
-            return JsonResponse({'message': 'File deleted successfully'})
-        except UploadFile.DoesNotExist:
-            return JsonResponse({'error': 'File not found'}, status=404)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
-# View to retrieve the content of a PDF file
-@csrf_exempt
-def file_content(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
-    title = request.GET.get('title')
-    print(title)
-    try:
-        # Retrieve the file from the database
-        file_obj = UploadFile.objects.get(title=title)
-    except UploadFile.DoesNotExist:
-        print('File not found')
-        # If the file does not exist, return a 404 Not Found response
-        return JsonResponse({'error': 'File not found'}, status=404)
-
-    # Open the file for reading in binary mode
-    with file_obj.pdf_file.open('rb') as file:
-        print("file opened")
-        file_path = file_obj.pdf_file.path
-        print(file_path)
-        # Create an HttpResponse with the content of the file
-        response = HttpResponse(file.read(), content_type="application/pdf")
-        response['Content-Disposition'] = f'attachment; filename="{file_obj.pdf_file.name}"'
-        return response
 
 
 # View to get PDF file from database
@@ -187,7 +143,7 @@ def server_pdf(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            title = data.get('title')
+            title = "IBP"
             user_query = data.get('query')
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)

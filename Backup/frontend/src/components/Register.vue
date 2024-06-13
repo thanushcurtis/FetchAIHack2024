@@ -1,7 +1,7 @@
 <template>
   <div class="register-container">
     <div class="header-container">
-      <h1 class="logo">TuiLearn</h1> 
+      <h1 class="logo">TCS Pension Proposer</h1> 
     </div>
     <div class="registration-form">
       <h1 class="form-title">Register</h1>
@@ -98,7 +98,7 @@ export default {
   position: fixed;
   margin-bottom: 700px;
   padding: 30px;
-  background-color: #d1b06e; /* Butter */
+  background-color: #af6b58; /* Butter */
   padding: 1em;
   color: #fff;
   text-align: center;
@@ -127,8 +127,8 @@ export default {
   margin-top: 10px;
   width:60%;
   border-radius: 5px;
-  background-color: #ffe4b5; /* Peach */
-  color: #8b5a2b; /* Dark Brown */
+  background-color: #af6b58; /* Peach */
+  color: #f7f5f3; /* Dark Brown */
   cursor: pointer;
   transition: background-color 0.3s ease;
   text-align: center; /* Add this line */
@@ -180,8 +180,8 @@ export default {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  background-color: #ffe4b5; /* Peach */
-  color: #8b5a2b; /* Dark Brown */
+  background-color: #af6b58; /* Peach */
+  color: #fefcfa; /* Dark Brown */
   cursor: pointer;
   transition: background-color 0.3s ease;
 }

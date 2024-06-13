@@ -1,15 +1,10 @@
 <template> 
-  
-    <h1>{{ currentTitle }} Chat
       <button @click="clearChatHistory" class="btn-clear">
         <i class="fa fa-refresh"></i> 
         Clear
       </button>
-    </h1>
-    <div class="file_content">
-      <iframe :src="fileContent" title="PDF Viewer" width="100%" height="100%"></iframe>
-    </div>
-
+   
+    
     <div class="chat-container">
       <div v-for="(message, index) in chatHistory[currentTitle] || []" :key="index" class="chat-message">
         <p :class="{ 'user-message': message.type === 'query', 'tui-message': message.type === 'response' }">
@@ -21,7 +16,14 @@
       </div>
   </div>
 
+  <button class="upload-button" @click="triggerFileInputClick">
+    <input type="file" id="file-input" @change="onFileChange" style="display: none;"  accept=".pdf">
+    <i class="fas fa-cloud-upload-alt" ></i> Upload User Data
+  </button>
+
     <form @submit.prevent="submitForm" class="chat-form">
+      
+      
       <div class="input-group">
         <label for="query" class="label">Query:</label>
         <input type="text" id="query" v-model="newQuery" required>
@@ -60,6 +62,9 @@ export default {
     this.fetchFileContent(); // Load chat history when the component is created
   },
   methods: {
+    triggerFileInputClick() {
+      document.getElementById('file-input').click();
+    },
      submitForm() {
       const currentTitle = this.currentTitle;
 
@@ -116,6 +121,31 @@ export default {
             this.fileContent = URL.createObjectURL(blob);
           });
       },
+      upload() {
+      if (!this.selectedFile) return; // Handle no file selected
+
+      let formData = new FormData();
+      formData.append('pdf_file', this.selectedFile);
+
+      let uploadUrl = '/api/upload/'; // Replace with your actual upload URL
+      const filesStore = useFilesStore();
+
+      fetch(uploadUrl, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include', // Include credentials if necessary for your server
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message) {
+            filesStore.getFiles(); // Update the store on successful upload
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          alert('Failed to upload file');
+        });
+    },
 
     fetchUser() {
       fetch('/api/whoami/', { credentials: 'include' })
@@ -263,6 +293,7 @@ export default {
   font-size:large;
   margin-left: 20px;
   margin-bottom: 10px;
+  margin-right: 40px;
 }
 
 .btn-clear:hover {
@@ -292,6 +323,19 @@ export default {
   
 }
 
+.upload-button {
+  padding: 1.2em 2em;
+  background-color:#135ee8fa;
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;  
+  font-size:large;
+  margin-left: 240px;
+  margin-top: 340px;
+
+}
 </style>
 
 

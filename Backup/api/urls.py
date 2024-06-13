@@ -15,7 +15,6 @@ urlpatterns = [
     path('get_files/',views.list_files,name='get_files'),
     path('server_pdf/', views.server_pdf, name='server_pdf'),
     path('logout/', views.logout_view, name='logout'),
-    path('delete/', views.delete_file, name='delete_file'),
-    path('retrieve/', views.file_content, name='retrieve_file'),
+   
     path('', views.FrontendAppView.as_view(), name='home'),
 ]

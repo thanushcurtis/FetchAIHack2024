@@ -1,45 +1,35 @@
 <template>
   <div id="app">
+    <!-- Header Section -->
     <header class="header">
       <div class="header-container">
-        <h1 class="logo">TuiLearn</h1>
-        <nav>
-          <button @click="logout" class="btn btn-logout">
-            <i class="fas fa-sign-out-alt"></i> Logout
-          </button>
+        <h1 class="logo">TCS  Pension Proposer</h1>
+        <nav>  
+          <button @click="logout" class="btn btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </nav>
       </div>
     </header>
+      
+       <div class=content>
+        <div class="welcom">
+          <h1>Welcome to TCS Pension Proposer </h1>
+        </div>
+        <Query> </Query> 
+       
+       </div>
 
-    <div class="main-container">
-      <div class="sidebar">
-        <h2>
-          <i class="fas fa-file-pdf"></i> 
-          Find your PDFs below
-        </h2>
-      <PDFs></PDFs> 
-    </div>
-      <section class="content">
-        <p3 class="username">Hello {{ username }}! 😊</p3>
-          <h2 class="welcome">
-            
-            Welcome to TuiLearn.
-          </h2>
-        <p>
-          TuiLearn: We provide a streamlined interface to access your study materials and keep yourself organized. This page helps you manage your PDFs, a valuable resource for learning.
-        </p>
-      </section>
-    </div>
+   
 
+    
+    <!-- Footer Section -->
     <footer>
       <p>&copy; 2024 TuiLearn. All rights reserved.</p>
     </footer>
   </div>
 </template>
-
 <script>
 import { defineComponent } from "vue";
-import Query from "./ServePdfForm.vue";
+import Query from "./Query.vue";
 import PDFs from "./SideBar.vue";
 import Upload from "./Upload.vue";
 
@@ -89,6 +79,7 @@ export default defineComponent({
         });
     }
   },
+
   created() {
     this.getFiles();
     fetch('/api/whoami/', { credentials: 'include' })
@@ -132,8 +123,8 @@ body {
 
 /* Header styles */
 .header {
-  background-color: #e3ac81;
-  background-image: linear-gradient(to right, #c47a42, #f1c98fad);
+  background-color: #efa873;
+  background-image: linear-gradient(to right, rgb(247, 157, 84), #af6b58);
   padding: 2em;
 }
 
@@ -209,9 +200,7 @@ body {
 
 .content {
   flex: 1;
-  padding: 2em;
-  margin-top: 100px;
-  font-size:2em;
+  margin-left: 25em;
   color: #0b0b0b;
 
 }
@@ -246,6 +235,8 @@ footer {
   left: 40%;
  
 }
+
+
 </style>
 
 
