@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { useFilesStore } from './../store/fileStore.js';
+import { useFilesStore } from '../store/fileStore.js';
 
 export default {
   data() {

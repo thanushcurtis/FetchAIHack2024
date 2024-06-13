@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { useFilesStore } from './../store/fileStore.js'; // Ensure this path matches the actual location of your fileStore
+import { useFilesStore } from '../store/fileStore.js'; // Ensure this path matches the actual location of your fileStore
 
 export default {
   mounted() {
