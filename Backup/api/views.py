@@ -7,7 +7,10 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from .forms import RegisterForm
 
-"""The following are the imports for the PDF file upload and processing"""
+"""
+The following are the imports for the PDF file 
+upload and processing
+"""
 
 from .models import UploadFile
 import json
@@ -31,7 +34,8 @@ data_mapping_address = ''
 recomendation_address = ''
 
 class FrontendAppView(TemplateView):
-    """This view renders the frontend app
+    """
+    This view renders the frontend app
 
     Attributes:
     template_name : str
@@ -39,20 +43,28 @@ class FrontendAppView(TemplateView):
 
     template_name = "index.html"
 
-# Custom 404 view
 def custom_404(request, exception):
-    """This view """
+    """This view handles 404 errors"""
 
     try:
-        return serve(request, 'index.html', document_root=settings.STATICFILES_DIRS[0])
+        return serve(request, 'index.html', 
+                     document_root=settings.STATICFILES_DIRS[0])
     except IndexError:
         raise Http404("index.html not found in static files")
-
-
 
 # View to upload a PDF file
 @csrf_exempt
 def upload_pdf_view(request):
+    """
+    This view uploads the pdf files
+    
+    Attributes:
+    form : gets the form for uploading file
+    files : gets the file object
+    title, extension : used for accessing file
+    upload_file : saves the file from the form
+    """
+    
     if request.method == 'POST':
         form = UploadPDFForm(request.POST, request.FILES)
 
@@ -64,10 +76,12 @@ def upload_pdf_view(request):
             print(file.title)
             print(title)
             if file.title == title:
-                return JsonResponse({'errors': 'Title already exists'}, status=409)
+                return JsonResponse({'errors': 'Title already exists'}, 
+                                    status=409)
         if form.is_valid():
             upload_file = form.save(commit=False)
-            #Check if the title already exists otherwise throw error
+
+            """Check if the title already exists otherwise throw error"""
             upload_file.user = request.user
             upload_file.save()
             return JsonResponse({'message': 'File uploaded successfully'})
@@ -76,16 +90,15 @@ def upload_pdf_view(request):
     else:
         return JsonResponse({'message': 'Invalid request method'}, status=400)
 
-
-
-
-
-
-# View to get PDF file from database
 @csrf_exempt
 def retrieve_file(title):
+    """
+    This view gets the PDF files from the database
+
+    Attributes:
+    file_obj : stores the file object
+    """
     try:
-        # Retrieve the file from the database
         file_obj = UploadFile.objects.get(title=title)
         return file_obj
     except UploadFile.DoesNotExist:
@@ -93,65 +106,73 @@ def retrieve_file(title):
     except Exception as e:
         return str(e)
 
-
-
-# View to load the documents to llama loader
 @csrf_exempt
 def load_documents(pdf_file_path):
+    """
+    This view loads the documents to llama loader 
+    """
+
     PDFReader = download_loader("PDFReader")
     loader = PDFReader()
     documents = loader.load_data(file=Path(pdf_file_path))
     return documents
 
-
-# View to create index
 @csrf_exempt
 def create_index(documents):
+    """
+    This view creates indexes
+    """
+
     cohere_api_key = os.getenv('cohere_api_key')
     model = "xlarge"
     temperature = 0.9
     max_tokens = 256
-    llm = Cohere(model=model, temperature=temperature, cohere_api_key=cohere_api_key, max_tokens=max_tokens)
+    llm = Cohere(model=model, temperature=temperature, 
+                 cohere_api_key=cohere_api_key, max_tokens=max_tokens)
     embeddings = CohereEmbeddings(cohere_api_key=cohere_api_key)
     service_context = ServiceContext.from_defaults(llm=llm, embed_model=embeddings)
     index = VectorStoreIndex.from_documents(documents, service_context=service_context)
     return index
 
-# View to retrieve query results
 @csrf_exempt
 def retrieve_query_results(index, user_query):
-    #this is the query engine with the required embeddings
+    """
+    This view gets the query results
+    """
+
     query_engine = index.as_query_engine()
-    #this is the context that will be used to generate the response
     query_results = query_engine.retrieve(user_query)
     return query_results
 
-
-
 @csrf_exempt
 def query_with_cohere(context, query):
+    """
+    This view sends the query to cohere and returns the response
+    """
+
     cohere_api_key = os.getenv('cohere_api_key')
     co = cohere.Client(cohere_api_key)
     prompt = f"Context: {context}\nQuery: {query}\nAnswer:"
     response = co.generate(
         model='command-nightly',
         prompt=prompt,
-        #test limit
         max_tokens=300,
-        #the higher the temprature the more creative the response
         temperature=0.7,
         presence_penalty=0.5,
-        num_generations=1,  # Generate multiple responses
-        stream=False,  # Disable streaming of response
-        truncate='END',  # Truncate input at the end if it exceeds the maximum token length
-        k=3,  # Enable top-k sampling with k=50
-        p=0.75  # Adjust nucleus sampling parameter
+        num_generations=1,  
+        stream=False, 
+        truncate='END',  
+        k=3,  
+        p=0.75  
     )
     return response.generations[0].text
 
-## MAIN VIEW TO PROCESS THE PDF FILE ## 
 @csrf_exempt
 def server_pdf(request):
+    """
+    This view processes the PDF files
+    """
+
     print(request)
     if request.method == 'POST':
         try:
@@ -159,49 +180,52 @@ def server_pdf(request):
             title = "IBP"
             user_query = data.get('query')
         except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+            return JsonResponse({'error': 'Invalid JSON'}, 
+                                status=400)
 
         file_obj = retrieve_file(title)
         if not file_obj:
-            return JsonResponse({'error': 'File not found'}, status=404)
+            return JsonResponse({'error': 'File not found'}, 
+                                status=404)
 
         pdf_file_path = file_obj.pdf_file.path
-        #LOAD THE DOCUMENTS
         documents = load_documents(pdf_file_path)
-        #CREATE THE INDEX
         index = create_index(documents)
-        #RETRIEVE THE QUERY RESULTS
         query_results = retrieve_query_results(index, user_query)
-        #GET THE CONTEXT FROM THE LLAMA INDEX
         context_from_llama_index = query_results  
-        #QUERY THE COHERE API
-        cohere_response = query_with_cohere(context_from_llama_index, user_query)
-        #RETURN THE RESPONSE
+        cohere_response = query_with_cohere(context_from_llama_index, 
+                                            user_query)
         return JsonResponse({'cohere_response': cohere_response})
     
     else:
         return HttpResponse('Method not allowed', status=405)
 
-
-# View to login
 @require_POST
 @csrf_exempt
 def login_view(request):
+    """
+    This view allows the user to log in
+    """
+
     if request.method == 'POST':
         data = json.loads(request.body)
         username = data.get('username')
         password = data.get('password')
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=username, 
+                            password=password)
         if user is not None:
             login(request, user)
             return JsonResponse({'detail': 'Login successful'})
         else:
-            return JsonResponse({'detail': 'Invalid credentials'}, status=400)
+            return JsonResponse({'detail': 'Invalid credentials'}, 
+                                status=400)
 
-
-# View to check if the user is authenticated
 @csrf_exempt
 def whoami_view(request):
+    """
+    This view checks if the user is authenticated
+    """
+
     print(request.user)
     print(request.user.is_authenticated)
     if not request.user.is_authenticated:
@@ -209,21 +233,25 @@ def whoami_view(request):
 
     return JsonResponse({'username': request.user.username})
 
-
-# View that gets all the PDF files uploaded by the user
 @login_required
 def list_files(request):
+  """
+  This view gets all the PDF files uploaded by the user
+  """
+
   if not request.user.is_authenticated:
     return JsonResponse({'error': 'Unauthorized'}, status=401)
 
-  files = UploadFile.objects.filter(user=request.user) # Filter by user
+  files = UploadFile.objects.filter(user = request.user) 
   titles = [file.title for file in files]
   return JsonResponse({'files': titles})
 
-
-# Register view
 @csrf_exempt
 def register(request):
+    """
+    This view allows the user to register
+    """
+
     if request.method == "POST":
         print(request.POST)
         # Load the JSON data 
@@ -235,28 +263,15 @@ def register(request):
         else:
             return JsonResponse({'errors': form.errors}, status=400)
     else:
-        return JsonResponse({'status': 'only POST method is allowed'}, status=405)
+        return JsonResponse({'status': 'only POST method is allowed'}, 
+                            status=405)
 
 # Logout view   
 @csrf_exempt
 def logout_view(request):
+        """
+        This view allows the user to log out
+        """
+
         logout(request)
         return JsonResponse({'status': 'success'}, status=200)
-
-# @csrf_exempt
-# async def summarise_information(request):
-#     response = await query(destination=summarise_address, message=SummariseRequest(), timeout=15.0)
-#     data = json.loads(response.decode_payload())
-#     return Response(data)
-
-# @csrf_exempt
-# async def map_data(request):
-#     response = await query(destination=data_mapping_address, message=DataMappingRequest(), timeout=15.0)
-#     data = json.loads(response.decode_payload())
-#     return Response(data)
-
-# @csrf_exempt
-# async def recommend(request):
-#     response = await query(destination=recomendation_address, message=RecommedRequest(), timeout=15.0)
-#     data = json.loads(response.decode_payload())
-#     return Response(data)
